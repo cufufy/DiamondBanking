@@ -1,0 +1,14 @@
+name: DiamondBanking
+version: ${project.version}
+main: net.recelate.diamondbanking.DiamondBanking
+api-version: 1.14
+depend: [Vault]
+authors: [Ellie]
+
+commands:
+  withdraw:
+    description: Withdraw your money as Diamonds.
+    usage: /withdraw [amount]
+  deposit:
+    description: Deposit the Diamonds in your main hand as Money.
+    usage: /deposit
