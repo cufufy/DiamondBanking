@@ -76,13 +76,17 @@ public final class DiamondBanking extends JavaPlugin
     {
         Player plr = (Player)sender;
 
-        if( plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND )
+        if( plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND ||
+            plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND_BLOCK )
         {
             plr.sendMessage("You must be holding Diamonds to use this command!");
             return true;
         }
 
         int amount = plr.getInventory().getItemInMainHand().getAmount();
+        if( plr.getInventory().getItemInMainHand().getType() == Material.DIAMOND_BLOCK )
+            amount *= 9;
+
         EconomyResponse r = econ.depositPlayer(plr, amount * config.getInt("DiamondWorth"));
         if( r.transactionSuccess() )
         {
