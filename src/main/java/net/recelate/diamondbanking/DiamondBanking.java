@@ -76,7 +76,7 @@ public final class DiamondBanking extends JavaPlugin
     {
         Player plr = (Player)sender;
 
-        if( plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND ||
+        if( plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND &&
             plr.getInventory().getItemInMainHand().getType() != Material.DIAMOND_BLOCK )
         {
             plr.sendMessage("You must be holding Diamonds to use this command!");
