@@ -1,7 +1,7 @@
 name: DiamondBanking
 version: ${project.version}
 main: net.recelate.diamondbanking.DiamondBanking
-api-version: 1.14
+api-version: 1.16
 depend: [Vault]
 authors: [Ellie]
 
