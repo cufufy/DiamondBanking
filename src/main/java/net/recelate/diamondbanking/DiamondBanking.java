@@ -33,14 +33,29 @@ public final class DiamondBanking extends JavaPlugin
             return;
         }
 
-        if( !loadConfig() )
-        {
-            log.severe(String.format("[%s] - Disabled, no configuration found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+        // Config handling starts
+        this.saveDefaultConfig(); // Ensures config.yml from JAR is in plugin's data folder if not already.
+        config = this.getConfig(); // Load it.
+
+        boolean defaultsApplied = false;
+        if (!config.contains("DiamondWorth")) {
+            getLogger().info("DiamondWorth not found in config.yml, setting default value (1).");
+            config.set("DiamondWorth", 1);
+            defaultsApplied = true;
+        }
+        // Ensure other defaults are set if this is a fresh config or they are missing
+        if (!config.contains("AllowLittering")) {
+            // Assuming 'AllowLittering' should also be explicitly defaulted if missing
+            // If DiamondWorth was missing, it's a good sign other defaults might be too.
+            getLogger().info("AllowLittering not found in config.yml, setting default value (true).");
+            config.set("AllowLittering", true);
+            defaultsApplied = true;
         }
 
-        config.addDefault("DiamondWorth", 300);
+        if (defaultsApplied) {
+            this.saveConfig(); // Save these initial defaults if any were applied.
+        }
+        // Config handling ends
     }
 
     @Override
@@ -49,26 +64,33 @@ public final class DiamondBanking extends JavaPlugin
         log.info(String.format("[%s] Disabled Version %s", getDescription().getName(), getDescription().getVersion()));
         if( config != null )
         {
-            config.options().copyDefaults(true);
+            // config.options().copyDefaults(true); // Ensure this line is removed
             saveConfig();
         }
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
-    {
-        if( !(sender instanceof Player) )
-        {
-            log.info("Only players are supported for this action.");
-            return false;
-        }
-
-        if( cmd.getLabel().toLowerCase().equals("deposit") )
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (cmd.getLabel().equalsIgnoreCase("deposit")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("This command can only be run by a player.");
+                return true;
+            }
             return handleDeposit(sender, cmd, label, args);
-
-        else if( cmd.getLabel().toLowerCase().equals("withdraw") )
+        } else if (cmd.getLabel().equalsIgnoreCase("withdraw")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("This command can only be run by a player.");
+                return true;
+            }
             return handleWithdraw(sender, cmd, label, args);
-
+        } else if (cmd.getLabel().equalsIgnoreCase("dbreload")) {
+            if (!sender.hasPermission("diamondbanking.reload")) {
+                sender.sendMessage("You do not have permission to use this command.");
+                return true;
+            }
+            reloadPluginConfig(sender);
+            return true;
+        }
         return false;
     }
 
@@ -173,6 +195,34 @@ public final class DiamondBanking extends JavaPlugin
         return true;
     }
 
+    public void reloadPluginConfig(CommandSender sender) {
+        // Reload the configuration from disk
+        this.reloadConfig();
+        // The 'config' object is now updated with values from config.yml
+
+        // Re-apply default setting logic (similar to onEnable)
+        // This ensures that if a user manually deletes a key from config.yml and reloads,
+        // the default value is reinstated and saved.
+        boolean defaultsApplied = false;
+        if (!config.contains("DiamondWorth")) {
+            getLogger().info("DiamondWorth not found in config.yml during reload, setting default value (1) and saving.");
+            config.set("DiamondWorth", 1);
+            defaultsApplied = true;
+        }
+        if (!config.contains("AllowLittering")) {
+            getLogger().info("AllowLittering not found in config.yml during reload, setting default value (true) and saving.");
+            config.set("AllowLittering", true);
+            defaultsApplied = true;
+        }
+
+        if (defaultsApplied) {
+            this.saveConfig(); // Save if any defaults were applied
+            sender.sendMessage("§aDiamondBanking configuration reloaded. Missing values were reset to defaults and saved.");
+        } else {
+            sender.sendMessage("§aDiamondBanking configuration reloaded successfully.");
+        }
+    }
+
     private boolean setupEconomy()
     {
         if( getServer().getPluginManager().getPlugin("Vault") == null )
@@ -184,13 +234,5 @@ public final class DiamondBanking extends JavaPlugin
 
         econ = rsp.getProvider();
         return econ != null;
-    }
-
-    private boolean loadConfig()
-    {
-        saveDefaultConfig();
-
-        config = getConfig();
-        return config != null;
     }
 }
