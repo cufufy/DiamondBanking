@@ -40,7 +40,7 @@ public final class DiamondBanking extends JavaPlugin
             return;
         }
 
-        config.addDefault("DiamondWorth", 300);
+        config.addDefault("DiamondWorth", 1);
     }
 
     @Override
