@@ -12,3 +12,8 @@ commands:
   deposit:
     description: Deposit the Diamonds in your main hand as Money.
     usage: /deposit
+  dbreload:
+    description: Reloads the DiamondBanking configuration.
+    usage: /dbreload
+    permission: diamondbanking.reload
+    permission-message: You do not have permission to reload DiamondBanking.
