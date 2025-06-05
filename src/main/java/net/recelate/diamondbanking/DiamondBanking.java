@@ -56,7 +56,6 @@ public final class DiamondBanking extends JavaPlugin
             this.saveConfig(); // Save these initial defaults if any were applied.
         }
         // Config handling ends
-=======
         config.addDefault("DiamondWorth", 1);
     }
 
